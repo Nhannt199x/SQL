@@ -1,0 +1,67 @@
+--Q1:
+--Create a table called Movie to store information about movies
+CREATE TABLE Movie(
+  movie_id int NOT NULL,
+  movie_name varchar(100) NOT NULL,
+  duration float NOT NULL CHECK (duration >=1), 
+  genre int NOT NULL CHECK (genre BETWEEN 1 AND 8), 
+  director varchar(50) NOT NULL, 
+  box_office_money float NOT NULL,
+  commets varchar(2000),
+  imagelink varchar(200) unique,
+  numberofactor int NOT NULL,
+  CONSTRAINT PK_Movie PRIMARY KEY (movie_id)
+  );
+--Create another table called Actor to store information about actors
+create TABLE Actor(
+  	actor_id int NOT NULL,
+	actor_name varchar(100) NOT NULL,
+    age int NOT NULL,
+    salary float NOT NULL,
+    nationality varchar(200) NOT NULL,
+  	CONSTRAINT PK_Actor PRIMARY KEY (actor_id)
+    );
+ --Create a final table called ActedIn to store information about which movies certain actors have acted in
+ CREATE TABLE ActedIn(
+   acted_id int NOT NULL,
+   movie_id int NOT NULL,
+   movie_name varchar(100) NOT NULL,
+   actor_id int NOT NULL,
+   actor_name varchar(100) NOT NULL,
+   CONSTRAINT PK_ActedIn PRIMARY KEy (acted_id, movie_id, actor_id),
+   CONSTRAINT FK_Movie FOREIGN key (movie_id) REFERENCES Movie(movie_id),
+   CONSTRAINT FK_Actor FOREIGN key (actor_id) REFERENCES Actor(actor_id)
+   );
+   --Q2:
+   --Populate your tables with some data using the INSERT statement.
+   INSERT INTO Movie(movie_id, movie_name, duration, genre, director, box_office_money, commets, imagelink, numberofactor)
+   VALUES
+   (0001, 'TOM AND JERRY', 3, 1, 'QUAN NGUYEN', 1.012, 'qua tuyet voi', 'www.http//google.com', 2),
+   (0002, 'DOREAMON', 1, 2, 'NHAN NGUYEN', 1.013, ' qua dinh', 'www.http//google1.com', 3),
+   (0003, 'OGGY', 2, 3, 'TRUNG NGUYEN', 2.012, 'qua xin', 'www.http//google2.com', 4),
+   (0004, 'TAY DU KY', 3, 5, 'CUONG NGUYEN', 2.011, 'tuoi tho', 'www.http//google3.com', 5),
+   (0005, 'TON NGO KHONG', 4 , 5, 'HUNG NGUYEN', 1.992,'EO EO', 'www.http//google4.com', 6)
+   INSERT INTO Actor(actor_id, actor_name, age, salary, nationality)
+   VALUES
+   (0001, 'QUAN NGUYEN', 22, 14.2, 'Viet nam'),
+   (0002, 'NHAN NGUYEN', 52, 12.5, 'viet nam'),
+   (0003, 'TRUNG NGUYEN', 64, 41.5, 'viet nam'),
+   (0004, 'CUONG NGUYEN', 24, 12, 'viet nam'),
+   (0005, 'HUNG NGUYEN', 53, 17, 'viet nam')
+   --Write a query to retrieve all the data in the Actor table for actors that are older than 50.
+   UPDATE Movie
+   SET director = 'NHAN NGUYEN'
+   WHERE movie_id = 0001;
+   --Q3:
+   --Write a query to retrieve all the data in the Actor table for actors that are older than 50.
+   SELECT * From Actor WHere age > 50;
+   --Write a query to retrieve all actor names and average salaries from ACTOR and sort the results by average salary.
+   SELECT actor_name, salary from Actor ORDER by salary;
+   --Using an actor name from your table, write a query to retrieve the names of all the movies that the actor has acted in.
+   SELECT movie_name, actor_name FROM ActedIn
+   where actor_name = 'TRUNG NGUYEN'
+   ORDER BY movie_name;
+   --Write a query to retrieve the names of all the action movies that amount of actor be greater than 3
+   SELECT movie_name from Movie
+   where genre AND numberofactor > 3
+   
