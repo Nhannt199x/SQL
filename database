@@ -1,0 +1,121 @@
+CREATE table Students(
+  student_id int PRIMARY key NOT NULL,
+  first_name varchar(20) NOT NULL,
+  last_name varchar(20) NOT NULL,
+  day_of_birth date NOT NULL,
+  address varchar(500) NOT NULL
+  );
+  
+  CREATE TABLE Teachers(
+  teacher_id int PRIMARY KEY NOT NULL,
+  first_name varchar(20) NOT NULL,
+  last_name varchar(20) NOT NULL,
+  date_of_birth date NOT NULL,
+  address varchar(500) NOT NULL,
+  exp int  NOT NULL CHECK (exp > 1)
+  );
+ 
+ CREATE TABLE Subject(
+  subject_id int NOT NULL,
+  title varchar(50) NOT NULL,
+  teacher_id int
+  CONSTRAINT PK_Subject PRIMARY KEy (subject_id, teacher_id),
+  CONSTRAINT FK_Teachers FOREIGN key (teacher_id) REFERENCES Teachers(teacher_id)
+  );
+ 
+CREATE TABLE Marks(
+  mark_id int NOT NULL,
+  student_id int,
+  teacher_id int,
+  subject_id int,
+  dateinput date,
+  mark float NOT NULL CHECK(mark BETWEEN 1 and 10)
+    PRIMARY KEy (mark_id, student_id, subject_id,teacher_id),
+    CONSTRAINT FK_Students FOREIGN key (student_id) REFERENCES Students(student_id),
+    CONSTRAINT FK_Subject FOREIGN key (subject_id, teacher_id) REFERENCES Subject(subject_id, teacher_id)
+  );
+  
+INSERT INTO Students(student_id, first_name, last_name, day_of_birth, address)
+VALUES
+ (0001, 'NGYEN', 'NHAN', '2000-01-01', 'THU DUC'),
+ (0002, 'NGUYEN', 'QUAN', '1996-09-26', 'DANG VAN BI'),
+ (0003, 'HUYNH', 'TRUNG', '1997-05-03', 'QUAN 7'),
+ (0004, 'MAI', 'CUONG', '1994-02-26', 'QUAN 7'),
+ (0005, 'DUONG', 'THIEN', '2003-02-25', 'NGA TU MK'),
+ (0006, 'NGUYEN', 'THIEN', '1992-10-12', 'BINH DUONG'),
+ (0007, 'NGUYEN', 'HUNG', '2002-04-09', 'UNKNOW'),
+ (0008, 'PHAM', 'QUYET', '1991-09-11', 'BINH TAN'),
+ (0009, 'BACH', 'TRONG', '1992-05-13', 'LA QUAN OAI'),
+ (0010, 'LE', 'PHONG', '1999-09-06', 'QUAN 7')
+ 
+ INSERT INTO Teachers(teacher_id, first_name, last_name, date_of_birth, address, exp)
+ VALUES
+ (1001, 'TRAN', 'NGA', '2000-05-05', 'QUAN 2, THU DUC', 10),
+ (1002, 'NGUYEN','TRUNG', '2000-01-04', 'FPT ACADEMY', 7),
+ (1003, 'HO', 'UYEN', '1997-04-02', 'FPT ACADEMY', 2),
+ (1004, 'NGUYEN', 'HAI', '2000-12-06', 'JAPAN', 2),
+ (1005, 'NGUYEN', 'DUC', '1994-08-03', 'PHU NHUAN', 3),
+ (1006, 'NGUYEN', 'TU', '1986-11-23', 'THU DUC', 5),
+ (1007, 'MANH', 'LAM', '1991-10-25', 'THU DUC', 6),
+ (1008, 'NGUYEN', 'UYEN', '1991-10-12', 'THU DUC', 11),
+ (1009, 'NGUYEN', 'AN', '1985-03-02', 'THU DUC', 10),
+ (1010, 'NGUYEN', 'LOC', '1990-07-23', 'THU DUC', 3)
+  
+  INSERT INTO Subject(subject_id, title, teacher_id)
+  VALUES
+  (01, 'TOAN HOC', 1001),
+  (02, 'HOA HOC', 1002),
+  (03, 'TIN HOC', 1003),
+  (04, 'LICH SU', 1004),
+  (05, 'GIAO HOC', 1005),
+  (06, 'THAN HOC', 1006),
+  (07, 'IT', 1007),
+  (08, 'SQL', 1008),
+  (09, 'C+', 1009),
+  (10, 'DEV', 1010)
+  
+  INSERT INTO Marks(mark_id, student_id, teacher_id, subject_id, dateinput, mark)
+  VALUES
+  (101, 0001, 1001, 01, '2015-02-01', 9.25),
+  (102, 0002, 1002, 02, '2016-01-02', 8.25),
+  (103, 0003, 1003, 03, '2016-02-03', 7.25),
+  (104, 0004, 1004, 04, '2017-01-03', 6.00),
+  (105, 0005, 1005, 05, '2018-05-12', 8.00),
+  (106, 0006, 1006, 06, '2019-04-01', 9.00),
+  (107, 0007, 1007, 07, '2020-12-04', 10.00),
+  (108, 0008, 1008, 08, '2021-07-02', 6.5),
+  (109, 0009, 1009, 09, '2021-12-24', 7.5),
+  (110, 0010, 1010, 10, '2020-11-21', 5.0)
+  
+--Add new column FullName into Teachers table. This is a computed column base on Firstname and last name attribute.
+ALTER TABLE Teachers
+add full_name as (first_name+ ' ' +last_name);
+
+--Query to display the list of subjects with their titles and the names of the teachers who teach them
+SELECT title, full_name FROM Subject s
+INNER JOIN Teachers t on t.teacher_id = s.teacher_id
+ORDER by full_name
+
+--Query to display the average mark for each subject
+SELECT s.title, AVG(m.mark) FROM Subject s
+INNER JOIN Marks m on m.subject_id = s.subject_id
+GROUP by s.title
+
+--Query to display the list of students with their full names and the average mark they have received for each subject, only including subjects where mark > 5
+SELECT n.first_name, n.last_name, s.title, AVG(m.mark) FROM Students n
+INNER JOIN Marks m on m.student_id = n.student_id
+INNER JOIN Subject s on s.subject_id = m.subject_id
+WHERE m.mark > 5
+GROUP by s.title, n.first_name, n.last_name
+
+--Query to display the list of students who have received a mark higher than 8 in at least one subject, with their full names and addresses 
+SELECT n.first_name, n.last_name, s.title, n.address from Students n
+INNER JOIN Marks m on m.student_id = n.student_id
+INNER JOIN Subject s ON s.subject_id = m.subject_id
+WHERE m.mark > 8
+GROUP by n.first_name, n.last_name, s.title, n.address
+--Query to display the list of subjects with their titles and the number of students who have received a mark higher than 5 for each subject
+SELECT s.title, m.mark, count(student_id) as number_of_student FROM Subject s
+INNER JOIN Marks m on s.subject_id = m.subject_id
+WHERE m.mark > 5
+GROUP BY s.title, m.mark
